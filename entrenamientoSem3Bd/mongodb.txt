@@ -49,6 +49,69 @@ streamHub> db.usuarios.find().pretty();
 
 db.listaReproduccion.insertMany([{"usuarioId":1,"nombre":"Favoritas de Ana","fechaCreacion":ISODate("2025-08-01T10:00:00Z"),"titulos":[{"tipo":"pelicula","id":1},{"tipo":"serie","id":1}]},{"usuarioId":2,"nombre":"Aventura de Luis","fechaCreacion":ISODate("2025-08-02T14:00:00Z"),"titulos":[{"tipo":"pelicula","id":2},{"tipo":"serie","id":2}]},{"usuarioId":3,"nombre":"Suspenso Total","fechaCreacion":ISODate("2025-08-03T16:30:00Z"),"titulos":[{"tipo":"pelicula","id":2},{"tipo":"pelicula","id":3}]},{"usuarioId":4,"nombre":"Comedia y Romance","fechaCreacion":ISODate("2025-08-04T11:15:00Z"),"titulos":[{"tipo":"serie","id":3}]},{"usuarioId":5,"nombre":"Documentales y Drama","fechaCreacion":ISODate("2025-08-05T09:45:00Z"),"titulos":[{"tipo":"pelicula","id":1},{"tipo":"serie","id":1}]}]);
 
+
+// consultas:
+
+db.peliculas.find({ duracion: { $gt: 120 } }).pretty() // me muestra todas las peliculas mayor a 2 horas.
+
+db.series.find({ episodiosTotales: { $lt: 70 } }).pretty() // en este caso me muestra las series con menos de 70 peliculas
+
+db.peliculas.find({ añoLanzamiento: { $eq: 2010 } }) // peliculas con año lanzamiento = a 2010
+
+db.usuarios.find({ "país": { $in: ["Colombia", "México"] } }) usuarios de colombia o mexico
+
+
+// aca utilizamos find() y $and para buscar usuarios del pais colombia y que tenga genero preferidos = Drama
+db.usuarios.find({
+  $and: [
+    { "país": "Colombia" },
+    { "géneros preferidos": "Drama" }
+  ]
+})
+
+// aca se busca de usuarios que empiecen con letra C pero despues con $options: "i" le decimos que ignore mayusculas o minusculas
+db.usuarios.find({
+  nombre: { $regex: /^C/, $options: "i" }
+})
+
+
+// aca eliminamos la valoracion de la pelicula the grey, ya que vamos a utilizar la coleccion valoraciones
+
+db.peliculas.updateOne(
+  { _id: 2 },
+  { $unset: { valoracion: "" } }
+)
+
+// crear indice para buscar de manera mas rapida titulo en forma ascendente:
+
+db.peliculas.createIndex({ titulo: 1 })
+
+// aca realizamos la busqueda con el index creado, esto evita que busque en toda la consulta y salta directamente a titulos
+
+db.peliculas.find({ titulo: "Inception" })
+
+
+// aca usamos aggregate() con $match y filtramos las valoraciones de las peliculas
+
+db.valoraciones.aggregate([
+  { $match: { tipo: "pelicula" } }
+])
+
+
+// ordenar las peliculas por duracion descendente
+
+db.peliculas.aggregate([
+  { $sort: { duracion: -1 } }
+])
+
+
+link repositorio en github:
+
+https://github.com/osvaldocs/entrenamientoSem3Bd
+
+
+
+
   
   
 
@@ -61,4 +124,3 @@ db.listaReproduccion.insertMany([{"usuarioId":1,"nombre":"Favoritas de Ana","fec
 
 
 	
-
