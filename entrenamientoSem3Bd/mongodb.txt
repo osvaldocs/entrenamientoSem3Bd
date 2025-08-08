@@ -1,0 +1,64 @@
+use streamHub; // creamos o seleccionamos la base de datos
+
+// Creamos las colecciones principales
+db.createCollection("peliculas");
+db.createCollection("series");
+db.createCollection("usuarios");
+db.createCollection("listaReproduccion");
+db.createCollection("valoraciones"):
+
+
+// Aca utilizamos el metodo insertOne(), pero me di cuenta que me crea automaticamente un _id poco intuitivo:
+streamHub> db.peliculas.insertOne({"titulo": "Inception", "duracion": 148, "añoLanzamiento": 2010, "genero": ["Ciencia ficción", "Acción"], "reparto": ["Leonardo Di Caprio", "Cillian Murhpy", "Joseph Gordon-levitt", "Tom Hardy", "Elliot Page"]});
+{
+  acknowledged: true,
+  insertedId: ObjectId('68960b87ff519f782089b03d')
+}
+
+//Enconces elimino ese documento y creo otro igual pero le agrego el id manualmente a 1:
+streamHub> db.peliculas.deleteOne({"titulo": "Inception"}) // Acá utilizamos deletOne para eliminar y buscamos por titulo.
+
+streamHub> db.peliculas.deleteOne({"titulo": "Inception"})
+{ acknowledged: true, deletedCount: 1 }
+streamHub> db.peliculas.insertOne({_id: 1, "titulo": "Inception", "duracion": 148, "añoLanzamiento": 2010, "genero": ["Ciencia ficción", "Acción"], "reparto": ["Leonardo Di Caprio", "Cillian Murhpy", "Joseph Gordon-levitt", "Tom Hardy", "Elliot Page"]});
+	
+streamHub> db.peliculas.insertMany([{_id: 2, "titulo": "The grey", "duracion": 117, "añoLanzamiento": 2011, "genero": ["Suspenso", "Acción"], "reparto": ["Liam Neeson", "Frank Grillo", "Dermot Mulroney"], "valoracion": 6.7}, {_id: 3, "titulo": "Cast away", "duracion": 143, "añoLanzamiento": 2000, "genero": ["Aventura", "Acción"], "reparto": ["Tom Hanks", "Helen Hunt", "Lari White"]}]);
+
+
+// insertamos con insertMany() la coleccion series:
+
+db.series.insertMany([{ "_id": 1, "titulo": "Breaking Bad", "temporadas": 5, "episodiosTotales": 62, "reparto": ["Bryan Cranston", "Aaron Paul", "Anna Gunn"] }, { "_id": 2, "titulo": "Game of Thrones", "temporadas": 8, "episodiosTotales": 73, "reparto": ["Emilia Clarke", "Kit Harington", "Peter Dinklage"] }, { "_id": 3, "titulo": "Okupas", "temporadas": 1, "episodiosTotales": 11, "reparto": ["Rodrigo de la Serna", "Franco Tirri", "Ariel Staltari"] }])
+
+
+// insertamos en usuarios:
+
+db.usuarios.insertMany([{"_id": 1, "nombre":"Ana Torres","correo electrónico":"ana.torres@email.com","país":"Colombia","géneros preferidos":["Drama","Ciencia ficción"]},{"_id": 2, "nombre":"Luis Méndez","correo electrónico":"luis.mendez@email.com","país":"México","géneros preferidos":["Acción","Aventura"]},{"_id": 3, "nombre":"Carla Jiménez","correo electrónico":"carla.jimenez@email.com","país":"Argentina","géneros preferidos":["Suspenso","Terror"]},{"_id": 4, "nombre":"Diego Ramírez","correo electrónico":"diego.ramirez@email.com","país":"Chile","géneros preferidos":["Comedia","Romance"]},{"_id": 5, "nombre":"Mariana López","correo electrónico":"mariana.lopez@email.com","país":"Perú","géneros preferidos":["Documental","Drama"]}]);
+
+// consultamos los usuarios insertados con find() + pretty() para que este mas ordenado el resultado:
+streamHub> db.usuarios.find().pretty();
+[
+  {
+    _id: 1,
+    nombre: 'Ana Torres',
+    'correo electrónico': 'ana.torres@email.com',
+    'país': 'Colombia',
+    'géneros preferidos': [ 'Drama', 'Ciencia ficción' ]
+  } //etc..
+  
+  // insertamos la coleccion listaReproduccion, utilizamos el formato de fecha ISODate().
+
+db.listaReproduccion.insertMany([{"usuarioId":1,"nombre":"Favoritas de Ana","fechaCreacion":ISODate("2025-08-01T10:00:00Z"),"titulos":[{"tipo":"pelicula","id":1},{"tipo":"serie","id":1}]},{"usuarioId":2,"nombre":"Aventura de Luis","fechaCreacion":ISODate("2025-08-02T14:00:00Z"),"titulos":[{"tipo":"pelicula","id":2},{"tipo":"serie","id":2}]},{"usuarioId":3,"nombre":"Suspenso Total","fechaCreacion":ISODate("2025-08-03T16:30:00Z"),"titulos":[{"tipo":"pelicula","id":2},{"tipo":"pelicula","id":3}]},{"usuarioId":4,"nombre":"Comedia y Romance","fechaCreacion":ISODate("2025-08-04T11:15:00Z"),"titulos":[{"tipo":"serie","id":3}]},{"usuarioId":5,"nombre":"Documentales y Drama","fechaCreacion":ISODate("2025-08-05T09:45:00Z"),"titulos":[{"tipo":"pelicula","id":1},{"tipo":"serie","id":1}]}]);
+
+  
+  
+
+
+
+
+
+
+
+
+
+	
+
