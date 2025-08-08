@@ -1,100 +1,76 @@
+# 📚 StreamHub – Base de datos en MongoDB
 
-📚 StreamHub – Base de datos en MongoDB
+Este proyecto simula la base de datos de una plataforma de streaming (**StreamHub**) usando **MongoDB**. Contiene colecciones para películas, series, usuarios, listas de reproducción y valoraciones.  
 
-Este proyecto simula la base de datos de una plataforma de streaming (StreamHub) usando MongoDB. Contiene colecciones para películas, series, usuarios, listas de reproducción y valoraciones.
-📂 Colecciones creadas
-
-    peliculas
-
-    series
-
-    usuarios
-
-    listaReproduccion
-
-    valoraciones
-
-🛠 Operaciones realizadas
-Creación de colecciones
-
+## 📂 Colecciones creadas
+```js
 db.createCollection("peliculas");
 db.createCollection("series");
 db.createCollection("usuarios");
 db.createCollection("listaReproduccion");
 db.createCollection("valoraciones");
+```
 
-Inserciones
+## 🛠 Operaciones realizadas
 
-    insertOne() → Para un solo documento (ejemplo: película Inception).
+Insertamos documentos con `insertOne()` para un solo registro y `insertMany()` para varios. En algunos casos usamos `_id` manual para evitar el `ObjectId` automático. Ejemplo:
+```js
+db.peliculas.insertOne({ _id: 1, titulo: "Inception", duracion: 148, añoLanzamiento: 2010, genero: ["Ciencia ficción", "Acción"], reparto: ["Leonardo Di Caprio", "Cillian Murphy", "Joseph Gordon-Levitt", "Tom Hardy", "Elliot Page"] });
+```
 
-    insertMany() → Para múltiples documentos (películas, series, usuarios, listas de reproducción).
-
-    Uso de _id personalizado para evitar ObjectId por defecto.
-
-Ejemplo:
-
-db.peliculas.insertOne({
-  _id: 1,
-  titulo: "Inception",
-  duracion: 148,
-  añoLanzamiento: 2010,
-  genero: ["Ciencia ficción", "Acción"],
-  reparto: ["Leonardo Di Caprio", "Cillian Murphy", "Joseph Gordon-Levitt", "Tom Hardy", "Elliot Page"]
-});
-
-Consultas (find())
-
-Filtrar por duración:
-
+### Consultas (`find()`)
+Películas con duración mayor a 120 minutos:
+```js
 db.peliculas.find({ duracion: { $gt: 120 } }).pretty();
-
-Filtrar por país usando $in:
-
+```
+Series con menos de 70 episodios:
+```js
+db.series.find({ episodiosTotales: { $lt: 70 } }).pretty();
+```
+Películas lanzadas en 2010:
+```js
+db.peliculas.find({ añoLanzamiento: { $eq: 2010 } });
+```
+Usuarios de Colombia o México:
+```js
 db.usuarios.find({ "país": { $in: ["Colombia", "México"] } });
-
-Filtros compuestos con $and:
-
-db.usuarios.find({
-  $and: [
-    { "país": "Colombia" },
-    { "géneros preferidos": "Drama" }
-  ]
-});
-
-Búsqueda por regex (ignora mayúsculas):
-
+```
+Usuarios de Colombia que prefieran "Drama":
+```js
+db.usuarios.find({ $and: [ { "país": "Colombia" }, { "géneros preferidos": "Drama" } ] });
+```
+Usuarios cuyo nombre comience con "C" (sin importar mayúsculas/minúsculas):
+```js
 db.usuarios.find({ nombre: { $regex: /^C/, $options: "i" } });
+```
 
-Actualizaciones
-
-Eliminar campo valoracion de una película:
-
+### Actualizaciones
+Eliminar campo `valoracion` de la película con `_id` 2:
+```js
 db.peliculas.updateOne({ _id: 2 }, { $unset: { valoracion: "" } });
+```
 
-Índices
-
+### Índices
 Crear índice por título:
-
+```js
 db.peliculas.createIndex({ titulo: 1 });
+```
+Buscar usando el índice:
+```js
+db.peliculas.find({ titulo: "Inception" });
+```
 
-Aggregations
-
-Filtrar valoraciones por tipo:
-
-db.valoraciones.aggregate([
-  { $match: { tipo: "pelicula" } }
-]);
-
+### Aggregations
+Filtrar valoraciones de películas:
+```js
+db.valoraciones.aggregate([{ $match: { tipo: "pelicula" } }]);
+```
 Ordenar películas por duración descendente:
+```js
+db.peliculas.aggregate([{ $sort: { duracion: -1 } }]);
+```
 
-db.peliculas.aggregate([
-  { $sort: { duracion: -1 } }
-]);
-
-📌 Notas
-
-    Se usaron fechas en formato ISODate para listas de reproducción.
-
-    Las colecciones están relacionadas de forma lógica a través de usuarioId y id de películas/series.
-
-    Uso básico de índices para mejorar rendimiento en búsquedas.
+## 📌 Notas
+- Fechas en listas de reproducción están en formato `ISODate`.
+- Las relaciones entre colecciones se manejan por `usuarioId` y `id` de película/serie.
+- Uso de índices para optimizar búsquedas.
